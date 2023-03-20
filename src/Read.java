@@ -81,16 +81,13 @@ public class Read {
     /**
      * sort the count map in ascending/descending order based off of value
      * @param unsorted the count map
-     * @param sortAsc decide to sort by ascending or descending
      * @return sorted map
      * @param <K>
      * @param <V>
      */
-        public static <K, V extends Comparable<V>> TreeMap<K, V> sortByValues(final Map<K, V> unsorted, Boolean sortAsc) {
+        public static <K, V extends Comparable<V>> TreeMap<K, V> sortByValues(final Map<K, V> unsorted) {
         Comparator<K>  valueComparator;
-        if(sortAsc)
-        {
-            valueComparator = new Comparator<K>() {
+          valueComparator = new Comparator<K>() {
                 public int compare(K k1, K k2) {
                     int compare = unsorted.get(k2).compareTo(unsorted.get(k1));
                     if (compare == 0)
@@ -101,18 +98,8 @@ public class Read {
             };
 
 
-        }
-        else {
-            valueComparator = new Comparator<K>() {
-                public int compare(K k1, K k2) {
-                    int compare = unsorted.get(k1).compareTo(unsorted.get(k2));
-                    if (compare == 0)
-                        return 1;
-                    else
-                        return compare;
-                }
-            };
-        }
+
+
             TreeMap<K, V> sorted = new TreeMap<K, V>(valueComparator);
             sorted.putAll(unsorted);
             return sorted;

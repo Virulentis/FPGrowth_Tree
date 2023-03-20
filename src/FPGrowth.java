@@ -16,7 +16,7 @@ public class FPGrowth {
         Map<Integer, Set<Integer>> data = read.read(arg, minsup);
         float minSup = read.getMinSup();
         Map<Integer, Integer> unsorted = read.countItems(data, minSup);
-        TreeMap<Integer, Integer> sorted = Read.sortByValues(unsorted, true);
+        TreeMap<Integer, Integer> sorted = Read.sortByValues(unsorted);
 //        TreeMap<Integer, Integer> sortedDes = Read.sortByValues(unsorted, false);
 
         createFPtree(data, sorted,  minSup);
@@ -76,7 +76,9 @@ public class FPGrowth {
             List<Integer> prefix = new ArrayList<>();
             makeCondTree(header, prefix, frequentItems, sortedMap, minSup);
 
+
         }
+        System.out.println(frequentItems.toString()+"here");
     }
 
 
@@ -89,8 +91,11 @@ public class FPGrowth {
      * @param minSup minimum support threshold.
      */
     private void makeCondTree(Node header, List<Integer> prefix, List<List<Integer>> frequentItems, TreeMap<Integer, Integer> sortedMap, float minSup) {
-        ArrayList<Integer> transaction = new ArrayList<>();
         ArrayList<ArrayList<Integer>> transactionList = new ArrayList<>();
+        TreeMap<Integer,Integer> sortedCount = new TreeMap<>();
+        int count = 0;
+        int tempVal = 0;
+        int nodeFrequency = 0;
 
         if(header != null && header.getName() != -1) {
             Tree conditionalTree = new Tree(minSup);
@@ -99,33 +104,78 @@ public class FPGrowth {
 
             while (temp != null && temp.getName() != -1)
             {
+
+                transactionList.add(new ArrayList<>());
+                nodeFrequency = temp.getFrequency();
                 while (temp.getParent().getName() != -1)
                 {
                     temp = temp.getParent();
-                    transaction.add(temp.getName());
+                    transactionList.get(count).add(temp.getName());
                 }
-                Collections.reverse(transaction);
+                Collections.reverse(transactionList.get(count));
                 temp = header.getLink();
                 header = header.getLink();
-                conditionalTree.addTransaction(transaction);
-                transaction.clear();
+
+
+                for(int i = 1; i < nodeFrequency; i++)
+                {
+                    transactionList.add(transactionList.get(count));
+                }
+
+
+                count = transactionList.size();
+            }
+            for(ArrayList<Integer> tempTransaction: transactionList)
+            {
+                for(int i: tempTransaction)
+                {
+                    if(sortedCount.get(i) == null){
+                        sortedCount.put(i, 1);
+                    }
+                    else {
+                        sortedCount.put(i, sortedCount.get(i)+1);
+                    }
+                }
+            }
+
+
+            Iterator<Map.Entry<Integer,Integer>> iterator = sortedCount.entrySet().iterator();
+            while(iterator.hasNext()){
+                Map.Entry<Integer,Integer> entry = iterator.next();
+                if(entry.getValue() < minSup)
+                {
+                    iterator.remove();
+                }
+            }
+
+
+            for(ArrayList<Integer> tempTransaction: transactionList)
+            {
+                Iterator<Integer> it = tempTransaction.iterator();
+                while (it.hasNext())
+                {
+                    tempVal = it.next();
+                    if(sortedCount.get(tempVal) == null){
+                        it.remove();
+                    }
+                }
+                conditionalTree.addTransaction(tempTransaction);
             }
 
             if (conditionalTree.getheaderTable().size() < 2) {
                 prefix.addAll(conditionalTree.getheaderTable().keySet());
                 frequentItems.add(prefix);
-                System.out.println(frequentItems.toString());
+
+
             }
-            else {
-                TreeMap<Integer, Integer> tempTree = new TreeMap<>(sortedMap);
-                tempTree.pollLastEntry();
-                System.out.println(conditionalTree.getheaderTable().toString());
+            else
+            {
+                header = conditionalTree.getheaderTable().get(sortedCount.lastKey());
+                frequentItems.add(prefix);
 
-                System.out.println(tempTree.lastKey());
-                header = conditionalTree.getheaderTable().get(tempTree.lastKey());
 
-                System.out.println("conditional tree "+header.name+" :H "+prefix+" p\n"+""+" FI ");
-                makeCondTree(header, prefix, frequentItems, tempTree, minSup);
+//                System.out.println("conditional tree "+header.name+" :H "+prefix+" p\n"+""+" FI ");
+                makeCondTree(header, prefix, frequentItems, sortedCount, minSup);
             }
         }
     }
