@@ -24,7 +24,7 @@ public class FPG {
 //            }
 //            fpg.start(args[0], minSup);
 //        }
-        fpg.start("data.txt", 50);
+        fpg.start("retail.txt", 5);
 
         sc.stop();
         System.out.println(sc.getSec());
