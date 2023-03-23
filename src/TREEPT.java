@@ -84,16 +84,21 @@ public class Tree {
 
         for (int j = 0; j < transaction.size(); j++) {
             int item = transaction.get(j);
+            Node prevTemp = temp;
             temp = temp.addChild(item);
 
-            if (headerTable.containsKey(item)) {
-                Node linkFind = headerTable.get(item);
-                while (linkFind.getLink() != null) {
-                    linkFind = linkFind.getLink();
+            if (prevTemp.getChildren().containsKey(item)) {
+                if (!headerTable.containsKey(item)) {
+                    headerTable.put(item, temp);
+                } else {
+                    Node linkFind = headerTable.get(item);
+                    while (linkFind.getLink() != null) {
+                        linkFind = linkFind.getLink();
+                    }
+                    if (linkFind != temp) {
+                        linkFind.setLink(temp);
+                    }
                 }
-                linkFind.setLink(temp);
-            } else {
-                headerTable.put(item, temp);
             }
         }
     }
