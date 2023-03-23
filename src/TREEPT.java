@@ -2,19 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 class Node {
-    int name;
-    int frequency;
-
-    Node parent;
-    Node link;
-    HashMap<Integer, Node> children;
-
-    public Node(int name, Node parent) {
-        this.name = name;
-        this.parent = parent;
-        children = new HashMap<>();
-        frequency = 1;
-    }
+    // ... (rest of the code remains unchanged)
 
     public Node addChild(int name) {
         Node child;
@@ -27,32 +15,26 @@ class Node {
         }
         return child;
     }
-
-    // Other methods remain unchanged
 }
 
 public class Tree {
-    private Node root;
-    private HashMap<Integer, Node> headerTable;
-
-    // Other methods and fields remain unchanged
+    // ... (rest of the code remains unchanged)
 
     public void addTransaction(ArrayList<Integer> transaction) {
-        Node temp = root;
+        Node currentNode = root;
 
-        for (int j = 0; j < transaction.size(); j++) {
-            int item = transaction.get(j);
-            temp = temp.addChild(item);
+        for (int item : transaction) {
+            currentNode = currentNode.addChild(item);
 
             if (!headerTable.containsKey(item)) {
-                headerTable.put(item, temp);
+                headerTable.put(item, currentNode);
             } else {
                 Node linkFind = headerTable.get(item);
-                while (linkFind.getLink() != null && linkFind.getLink() != temp) {
+                while (linkFind.getLink() != null && linkFind.getLink() != currentNode) {
                     linkFind = linkFind.getLink();
                 }
                 if (linkFind.getLink() == null) {
-                    linkFind.setLink(temp);
+                    linkFind.setLink(currentNode);
                 }
             }
         }
