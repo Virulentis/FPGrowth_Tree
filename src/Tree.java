@@ -106,12 +106,16 @@ public class Tree {
             //this is to set the header tables links so that you can find every iteration of an item through the header table.
             if (headerTable.get(temp.getName()) != null )
             {
-                Node linkFind = headerTable.get(temp.getName());
-                while (linkFind.getLink() != null)
+                if(temp.frequency < 2)
                 {
-                    linkFind = linkFind.getLink();
+                    Node linkFind = headerTable.get(temp.getName());
+                    while (linkFind.getLink() != null)
+                    {
+                        linkFind = linkFind.getLink();
+                    }
+                    linkFind.setLink(temp);
                 }
-                linkFind.setLink(temp);
+
             }
             else
             {

@@ -24,8 +24,8 @@ public class FPG {
 //            }
 //            fpg.start(args[0], minSup)
 //        }
-        fpg.start("FPGrowth_Tree-792bcc7121169e2a51ea3837820b1b8ddd513510/connect.txt",
-                98);
+        fpg.start("FPGrowth_Tree-792bcc7121169e2a51ea3837820b1b8ddd513510/retail.txt",
+                5);
 
         sc.stop();
         System.out.println(sc.getMillisec() + " ms\n" + sc.getSec() + " seconds");
