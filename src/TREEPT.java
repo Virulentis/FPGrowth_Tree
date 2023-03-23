@@ -1,9 +1,6 @@
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * Nodes that hold the children, parent, frequency, and link
- */
 class Node {
     int name;
     int frequency;
@@ -19,15 +16,16 @@ class Node {
         frequency = 1;
     }
 
-    public Node addChild(Node nodeN) {
-        if (!children.containsKey(nodeN.name)) {
-            children.put(nodeN.name, nodeN);
+    public Node addChild(int name) {
+        Node child;
+        if (children.containsKey(name)) {
+            child = children.get(name);
+            child.incFrequency();
         } else {
-            nodeN = children.get(nodeN.name);
-            nodeN.incFrequency();
-            children.put(nodeN.name, nodeN);
+            child = new Node(name, this);
+            children.put(name, child);
         }
-        return nodeN;
+        return child;
     }
 
     public int getFrequency() {
@@ -55,28 +53,12 @@ class Node {
     }
 
     public void setLink(Node link) {
-        if (link != this && !checkForCycle(link)) {
+        if (link != this) {
             this.link = link;
-        } else {
-            System.err.println("Warning: Cannot set link. It would create a cycle.");
         }
-    }
-
-    private boolean checkForCycle(Node node) {
-        Node current = this;
-        while (current != null) {
-            if (current == node) {
-                return true;
-            }
-            current = current.getLink();
-        }
-        return false;
     }
 }
 
-/**
- * The growth tree that holds the root and header table.
- */
 public class Tree {
     private Node root;
     private HashMap<Integer, Node> headerTable;
@@ -97,24 +79,21 @@ public class Tree {
         return root;
     }
 
-    /**
-     * Adds all the items listed to the tree as well as the header table.
-     * @param transaction list of items that are to be added to the tree.
-     */
     public void addTransaction(ArrayList<Integer> transaction) {
         Node temp = root;
 
         for (int j = 0; j < transaction.size(); j++) {
-            temp = temp.addChild(new Node(transaction.get(j), temp));
+            int item = transaction.get(j);
+            temp = temp.addChild(item);
 
-            if (headerTable.get(temp.getName()) != null) {
-                Node linkFind = headerTable.get(temp.getName());
+            if (headerTable.containsKey(item)) {
+                Node linkFind = headerTable.get(item);
                 while (linkFind.getLink() != null) {
                     linkFind = linkFind.getLink();
                 }
                 linkFind.setLink(temp);
             } else {
-                headerTable.put(temp.getName(), temp);
+                headerTable.put(item, temp);
             }
         }
     }
