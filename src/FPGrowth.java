@@ -4,6 +4,25 @@ import java.util.*;
 public class FPGrowth {
 
 
+    public static <K, V extends Comparable<V>> TreeMap<K, V> sortByValues(final Map<K, V> unsorted) {
+        Comparator<K>  valueComparator;
+        valueComparator = new Comparator<K>() {
+            public int compare(K k1, K k2) {
+                int compare = unsorted.get(k2).compareTo(unsorted.get(k1));
+                if (compare == 0)
+                    return 1;
+                else
+                    return compare;
+            }
+        };
+
+
+        TreeMap<K, V> sorted = new TreeMap<K, V>(valueComparator);
+        sorted.putAll(unsorted);
+        return sorted;
+
+    }
+
     /**
      * Starts the program by reading the input, then counting it
      * afterwards it sorts it by ascending and descending
@@ -15,10 +34,9 @@ public class FPGrowth {
         Read read = new Read();
         Map<Integer, Set<Integer>> data = read.read(arg, minsup);
         float minSup = read.getMinSup();
-        Map<Integer, Integer> unsorted = read.countItems(data, minSup);
-        TreeMap<Integer, Integer> sorted = Read.sortByValues(unsorted);
-//        TreeMap<Integer, Integer> sortedDes = Read.sortByValues(unsorted, false);
-
+        Map<Integer, Integer> unsorted = read.countItems(arg, minsup);
+        System.out.println(unsorted.toString());
+        TreeMap<Integer, Integer> sorted = sortByValues(unsorted);
         createFPtree(data, sorted,  minSup);
     }
 
@@ -79,11 +97,17 @@ public class FPGrowth {
             Node header = fpTree.getheaderTable().get(temp);
             frequentItems.put(Collections.singleton(entry.getKey()), entry.getValue());
             List<Integer> prefix = new ArrayList<>();
-            makeCondTree(header, prefix, frequentItems, sortedMap, minSup);
+            makeCondTree(header, prefix, frequentItems, minSup);
 
 
         }
-        System.out.println(frequentItems.toString()+"\nsize:"+frequentItems.size());
+        System.out.println("\n\n|FPs| "+frequentItems.size()+"\n");
+
+        for(Map.Entry<Set<Integer>, Integer> f : frequentItems.entrySet())
+        {
+
+            System.out.println(f.getKey()+" : "+f.getValue());
+        }
     }
 
 
@@ -92,12 +116,11 @@ public class FPGrowth {
      * @param header The current node for
      * @param prefix All the nodes
      * @param frequentItems list of frequent items
-     * @param sortedMap the count sorted by value ascending
      * @param minSup minimum support threshold.
      */
-    private void makeCondTree(Node header, List<Integer> prefix, HashMap<Set<Integer>, Integer> frequentItems, TreeMap<Integer, Integer> sortedMap, float minSup) {
+    private void makeCondTree(Node header, List<Integer> prefix, HashMap<Set<Integer>, Integer> frequentItems, float minSup) {
         ArrayList<ArrayList<Integer>> transactionList = new ArrayList<>();
-        TreeMap<Integer,Integer> sortedCount = new TreeMap<>();
+        LinkedHashMap<Integer,Integer> sortedCount = new LinkedHashMap<>();
         int count = 0;
         int tempVal = 0;
         int nodeFrequency = 0;
@@ -168,13 +191,31 @@ public class FPGrowth {
             }
 
             Set<Integer> FIbuffer = new HashSet<>(prefix);
+            Integer[] aKeys = sortedCount.keySet().toArray(new Integer[sortedCount.size()]);
+
+
+//            while(conditionalTree.getheaderTable().size() > 2)
+//            {
+//                header = conditionalTree.getheaderTable().remove(aKeys[aKeys.length-1]);
+//                System.out.println(header.name);
+//                makeCondTree(header, prefix, frequentItems, minSup);
+//            }
+//
+//
+//            for(Map.Entry<Integer, Integer> i: sortedCount.entrySet())
+//            {
+//                FIbuffer.add(i.getKey());
+//                frequentItems.put(FIbuffer, i.getValue());
+//                FIbuffer = new HashSet<>(prefix);
+//            }
+
 
             if (conditionalTree.getheaderTable().size() < 2 ) {
 
                 if(sortedCount.size() > 0)
                 {
-                    FIbuffer.add(sortedCount.lastKey());
-                    frequentItems.put(FIbuffer, sortedCount.lastEntry().getValue());
+                    FIbuffer.add(aKeys[aKeys.length-1]);
+                    frequentItems.put(FIbuffer, aKeys[aKeys.length-1]);
                     System.out.println(FIbuffer.toString()+" size > 0");
                 }
 
@@ -182,7 +223,7 @@ public class FPGrowth {
             }
             else
             {
-                header = conditionalTree.getheaderTable().get(sortedCount.lastKey());
+                header = conditionalTree.getheaderTable().get(aKeys[aKeys.length-1]);
 //                frequentItems.add(prefix);
 
                 for(Map.Entry<Integer, Integer> i: sortedCount.entrySet())
@@ -194,8 +235,12 @@ public class FPGrowth {
 
 
 
-                makeCondTree(header, prefix, frequentItems, sortedCount, minSup);
+                makeCondTree(header, prefix, frequentItems, minSup);
             }
+
+
+
+
         }
     }
 

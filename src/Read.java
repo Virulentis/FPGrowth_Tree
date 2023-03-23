@@ -78,6 +78,45 @@ public class Read {
     }
 
 
+    public Map<Integer, Integer> countItems(String fileName, int minsup) throws FileNotFoundException {
+        File f = new File(fileName);
+        TreeMap<Integer, Integer> countItems = new TreeMap<>();
+        Scanner sc = new Scanner(f);
+        int tempNum = 0;
+
+        minSup = sc.nextInt() * (minsup / 100f);
+
+        while (sc.hasNextInt()){
+            int orderNum = sc.nextInt();
+            int items = sc.nextInt();
+
+            for(int i = 0; i < items; i++){
+                tempNum = sc.nextInt();
+                if(countItems.get(tempNum) == null)
+                {
+                    countItems.put(tempNum, 1);
+                }
+                else {
+                    countItems.put(tempNum, countItems.get(tempNum)+1);
+                }
+            }
+        }
+
+        Iterator<Map.Entry<Integer,Integer>> iterator = countItems.entrySet().iterator();
+        while (iterator.hasNext())
+        {
+            Map.Entry<Integer,Integer> entry = iterator.next();
+            if(entry.getValue() < minSup)
+            {
+                iterator.remove();
+            }
+        }
+
+        return countItems;
+
+    }
+
+
     /**
      * sort the count map in ascending/descending order based off of value
      * @param unsorted the count map
@@ -85,26 +124,7 @@ public class Read {
      * @param <K>
      * @param <V>
      */
-        public static <K, V extends Comparable<V>> TreeMap<K, V> sortByValues(final Map<K, V> unsorted) {
-        Comparator<K>  valueComparator;
-          valueComparator = new Comparator<K>() {
-                public int compare(K k1, K k2) {
-                    int compare = unsorted.get(k2).compareTo(unsorted.get(k1));
-                    if (compare == 0)
-                        return 1;
-                    else
-                        return compare;
-                }
-            };
 
-
-
-
-            TreeMap<K, V> sorted = new TreeMap<K, V>(valueComparator);
-            sorted.putAll(unsorted);
-            return sorted;
-
-        }
 
 
     }

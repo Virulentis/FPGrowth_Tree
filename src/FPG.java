@@ -24,10 +24,10 @@ public class FPG {
 //            }
 //            fpg.start(args[0], minSup);
 //        }
-        fpg.start("retail.txt", 5);
+        fpg.start("data.txt", 25);
 
         sc.stop();
-        System.out.println(sc.getSec());
+        System.out.println(sc.getMillisec() + " ms\n" + sc.getSec() + " seconds");
         System.out.println("Finished");
 
 
