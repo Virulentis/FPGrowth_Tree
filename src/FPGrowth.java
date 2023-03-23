@@ -22,19 +22,26 @@ public class FPGrowth {
 
     /**
      * Starts the program by reading the input, then counting it
-     * afterwards it sorts it by ascending
+     * afterwards it sorts it by ascending and descendin
      * @param arg    file path provided by user
      * @param minsup minimum support threshold
      * @throws FileNotFoundException if the file provided does not exist
      */
     public void start(String arg, Integer minsup) throws FileNotFoundException {
         Read read = new Read();
-        Map<Integer, Set<Integer>> data = read.read(arg, minsup);
+//        Map<Integer, Set<Integer>> data = read.read(arg, minsup);
         float minSup = read.getMinSup();
-        Map<Integer, Integer> unsorted = read.countItems(arg, minsup);
+        TreeMap<Integer, Integer> unsorted = read.countItems(arg, minsup);
+
         System.out.println(unsorted.toString());
         TreeMap<Integer, Integer> sorted = sortByValues(unsorted);
-        createFPtree(data, sorted, minSup);
+        startMine(read.createFPTree(arg, minSup, sorted),sorted,minSup);
+//        createFPtree(data, sorted, minSup);
+
+
+
+
+
     }
 
     /**
@@ -45,7 +52,6 @@ public class FPGrowth {
      * @param minSup    minimum support threshold
      */
     private void createFPtree(Map<Integer, Set<Integer>> data, TreeMap<Integer, Integer> sortedMap, float minSup) {
-        Node treeRoot = new Node(-1, null);
         Tree fpTree = new Tree(minSup);
         ArrayList<Integer> transaction = new ArrayList<>();
 

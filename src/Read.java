@@ -11,74 +11,112 @@ public class Read {
 
     /**
      * reads through the dataset and sets the minimum support threshold
-     * @param arg file path
+     *
+     * @param arg    file path
      * @param minsup minimum support
+     * @param sorted
      * @return a datatype holding the dataset
      * @throws FileNotFoundException if the file provided does not exist
      */
-    public Map<Integer, Set<Integer>> read(String arg, int minsup) throws FileNotFoundException {
-        Map<Integer, Set<Integer>> data = new HashMap<>();
+//    public Map<Integer, Set<Integer>> read(String arg, int minsup) throws FileNotFoundException {
+//        Map<Integer, Set<Integer>> data = new HashMap<>();
+//
+//        File f = new File(arg);
+//        Scanner sc = new Scanner(f);
+//
+//        minSup = sc.nextInt() * (minsup / 100f);
+//
+//        while (sc.hasNextInt()){
+//            int orderNum = sc.nextInt();
+//            int items = sc.nextInt();
+//            data.put(orderNum, new HashSet<>());
+//            for(int i = 0; i < items; i++){
+//                data.get(orderNum).add(sc.nextInt());
+//            }
+//        }
+//        sc.close();
+//
+//
+//        return data;
+//    }
 
-        File f = new File(arg);
+    public Tree createFPTree(String fileName, float minsup, TreeMap<Integer, Integer> sorted) throws FileNotFoundException {
+        Tree fpTree = new Tree(minSup);
+        File f = new File(fileName);
         Scanner sc = new Scanner(f);
+        ArrayList<Integer> transaction = new ArrayList<>();
+        Set<Integer> holdRow = new HashSet<>();
+        sc.nextInt();
 
-        minSup = sc.nextInt() * (minsup / 100f);
-
-        while (sc.hasNextInt()){
-            int orderNum = sc.nextInt();
+        while (sc.hasNext())
+        {
+            sc.nextInt();
             int items = sc.nextInt();
-            data.put(orderNum, new HashSet<>());
             for(int i = 0; i < items; i++){
-                data.get(orderNum).add(sc.nextInt());
+                int itemNum = sc.nextInt();
+                holdRow.add(itemNum);
             }
+            System.out.println("holdrow "+holdRow.toString());
+            for(int i: sorted.keySet())
+            {
+                if(holdRow.contains(i))
+                {
+                    transaction.add(i);
+                }
+            }
+            fpTree.addTransaction(transaction);
+            transaction.clear();
+            holdRow.clear();
         }
         sc.close();
 
 
-        return data;
+        System.out.println(fpTree.getheaderTable().toString());
+
+        return fpTree;
     }
 
-    /**
-     * reads through the dataset and counts each item
-     * @param data a datatype holding the datatype
-     * @param minSup minimum support threshold
-     * @return the count of the item
-     */
-    public Map<Integer, Integer> countItems(Map<Integer, Set<Integer>> data, float minSup) {
+        /**
+         * reads through the dataset and counts each item
+         * @param data a datatype holding the datatype
+         * @param minSup minimum support threshold
+         * @return the count of the item
+         */
+//    public Map<Integer, Integer> countItems(Map<Integer, Set<Integer>> data, float minSup) {
+//
+//        Map<Integer, Integer> count = new TreeMap<>();
+//
+//
+//        for(int x: data.keySet())
+//        {
+//            Set<Integer> temp = data.get(x);
+//            for(int y: temp){
+//
+//                if(count.get(y) == null)
+//                {
+//                    count.put(y, 1);
+//                }
+//                else {
+//                    count.put(y, count.get(y)+1);
+//                }
+//            }
+//        }
+//
+//        Map<Integer, Integer> temp = new TreeMap<>(count);
+//
+//        for(int z: temp.keySet())
+//        {
+//            if((float) temp.get(z) < minSup)
+//            {
+//                count.remove(z);
+//            }
+//        }
+//
+//        return count;
+//    }
 
-        Map<Integer, Integer> count = new TreeMap<>();
 
-
-        for(int x: data.keySet())
-        {
-            Set<Integer> temp = data.get(x);
-            for(int y: temp){
-
-                if(count.get(y) == null)
-                {
-                    count.put(y, 1);
-                }
-                else {
-                    count.put(y, count.get(y)+1);
-                }
-            }
-        }
-
-        Map<Integer, Integer> temp = new TreeMap<>(count);
-
-        for(int z: temp.keySet())
-        {
-            if((float) temp.get(z) < minSup)
-            {
-                count.remove(z);
-            }
-        }
-
-        return count;
-    }
-
-
-    public Map<Integer, Integer> countItems(String fileName, int minsup) throws FileNotFoundException {
+    public TreeMap<Integer, Integer> countItems(String fileName, int minsup) throws FileNotFoundException {
         File f = new File(fileName);
         TreeMap<Integer, Integer> countItems = new TreeMap<>();
         Scanner sc = new Scanner(f);

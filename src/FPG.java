@@ -24,6 +24,7 @@ public class FPG {
 //            }
 //            fpg.start(args[0], minSup);
 //        }
+
         fpg.start("1k5L.txt", 2);
 
         sc.stop();
