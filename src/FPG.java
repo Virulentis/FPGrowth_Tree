@@ -22,10 +22,10 @@ public class FPG {
 //                System.out.println("Minimum support must be between 0-100");
 //                System.exit(0);
 //            }
-//            fpg.start(args[0], minSup);
+//            fpg.start(args[0], minSup)
 //        }
-
-        fpg.start("1k5L.txt", 2);
+        fpg.start("FPGrowth_Tree-792bcc7121169e2a51ea3837820b1b8ddd513510/connect.txt",
+                98);
 
         sc.stop();
         System.out.println(sc.getMillisec() + " ms\n" + sc.getSec() + " seconds");

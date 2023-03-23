@@ -104,7 +104,7 @@ public class Tree {
             temp = temp.addChild(new Node(transaction.get(j), temp));
 
             //this is to set the header tables links so that you can find every iteration of an item through the header table.
-            if (headerTable.get(temp.getName()) != null)
+            if (headerTable.get(temp.getName()) != null )
             {
                 Node linkFind = headerTable.get(temp.getName());
                 while (linkFind.getLink() != null)
