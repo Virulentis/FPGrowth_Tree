@@ -24,9 +24,9 @@ public class Stopwatch {
         return (stopTime - startTime);
     }
 
-    public long getMillisec(){
-        return (long) (getTime()*0.000001);
+    public float getMillisec(){
+        return (float) (getTime()*0.000001);
     }
 
-    public long getSec(){return (long) (getMillisec()*0.001);}
+    public float getSec(){return (float) (getMillisec()*0.001);}
 }

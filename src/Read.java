@@ -1,9 +1,30 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 public class Read {
     public float minSup;
+
+    /**
+     * writes to the file MiningResult.txt the frequent patterns in no
+     * specified order.
+     * @param frequentItems the item(s) that are above the minimum support threshold.
+     * @throws IOException
+     */
+    public static void outputFP(HashMap<Set<Integer>, Integer> frequentItems) throws IOException {
+        File fileOut = new File("MiningResult.txt");
+        FileWriter myWriter = new FileWriter(fileOut);
+        myWriter.write("|FPs| = "+ frequentItems.size());
+
+        for(Map.Entry<Set<Integer>, Integer> f : frequentItems.entrySet())
+        {
+            myWriter.write("\n"+f.getKey()+" : "+f.getValue());
+        }
+        myWriter.close();
+
+    }
 
     public float getMinSup() {
         return minSup;
@@ -38,56 +59,25 @@ public class Read {
         return data;
     }
 
+
     /**
-     * reads through the dataset and counts each item
-     * @param data a datatype holding the datatype
-     * @param minSup minimum support threshold
-     * @return the count of the item
+     * Counts each individual items frequency and removes the items that
+     * are under the minimum support threshold
+     * @param fileName name of the file where the dataset is
+     * @param minsup mininmum support threshold
+     * @return map containing the item number and the frequency of the item
+     * @throws FileNotFoundException if the file does not exist at the location
      */
-    public Map<Integer, Integer> countItems(Map<Integer, Set<Integer>> data, float minSup) {
-
-        Map<Integer, Integer> count = new TreeMap<>();
-
-
-        for(int x: data.keySet())
-        {
-            Set<Integer> temp = data.get(x);
-            for(int y: temp){
-
-                if(count.get(y) == null)
-                {
-                    count.put(y, 1);
-                }
-                else {
-                    count.put(y, count.get(y)+1);
-                }
-            }
-        }
-
-        Map<Integer, Integer> temp = new TreeMap<>(count);
-
-        for(int z: temp.keySet())
-        {
-            if((float) temp.get(z) < minSup)
-            {
-                count.remove(z);
-            }
-        }
-
-        return count;
-    }
-
-
     public Map<Integer, Integer> countItems(String fileName, int minsup) throws FileNotFoundException {
         File f = new File(fileName);
         TreeMap<Integer, Integer> countItems = new TreeMap<>();
         Scanner sc = new Scanner(f);
-        int tempNum = 0;
+        int tempNum;
 
         minSup = sc.nextInt() * (minsup / 100f);
 
         while (sc.hasNextInt()){
-            int orderNum = sc.nextInt();
+            sc.nextInt();
             int items = sc.nextInt();
 
             for(int i = 0; i < items; i++){
@@ -102,15 +92,7 @@ public class Read {
             }
         }
 
-        Iterator<Map.Entry<Integer,Integer>> iterator = countItems.entrySet().iterator();
-        while (iterator.hasNext())
-        {
-            Map.Entry<Integer,Integer> entry = iterator.next();
-            if(entry.getValue() < minSup)
-            {
-                iterator.remove();
-            }
-        }
+        countItems.entrySet().removeIf(entry -> entry.getValue() < minSup);
 
         return countItems;
 

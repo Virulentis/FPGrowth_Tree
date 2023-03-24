@@ -1,7 +1,8 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public class FPG {
-    public static void main(String[] args) throws FileNotFoundException {
+    public static void main(String[] args) throws IOException {
         int minSup = 0;
         Stopwatch sc = new Stopwatch();
         sc.start();
@@ -22,14 +23,13 @@ public class FPG {
 //                System.out.println("Minimum support must be between 0-100");
 //                System.exit(0);
 //            }
-//            fpg.start(args[0], minSup)
+//            fpg.start(args[0], minSup);
 //        }
-        fpg.start("FPGrowth_Tree-792bcc7121169e2a51ea3837820b1b8ddd513510/retail.txt",
-                5);
+        fpg.start("connect.txt", 98);
 
         sc.stop();
         System.out.println(sc.getMillisec() + " ms\n" + sc.getSec() + " seconds");
-        System.out.println("Finished");
+
 
 
 

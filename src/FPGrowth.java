@@ -1,9 +1,17 @@
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 public class FPGrowth {
 
 
+    /**
+     * Sort the maps items based on the value first then the key
+     * @param unsorted the map that needs to be sorted
+     * @return a TreeMap that is sorted by value then key
+     * @param <K> key of map
+     * @param <V> value of map
+     */
     public static <K, V extends Comparable<V>> TreeMap<K, V> sortByValues(final Map<K, V> unsorted) {
         Comparator<K>  valueComparator;
         valueComparator = new Comparator<K>() {
@@ -30,12 +38,11 @@ public class FPGrowth {
      * @param minsup minimum support threshold
      * @throws FileNotFoundException if the file provided does not exist
      */
-    public void start(String arg, Integer minsup) throws FileNotFoundException {
+    public void start(String arg, Integer minsup) throws IOException {
         Read read = new Read();
         Map<Integer, Set<Integer>> data = read.read(arg, minsup);
         float minSup = read.getMinSup();
         Map<Integer, Integer> unsorted = read.countItems(arg, minsup);
-        System.out.println(unsorted.toString());
         TreeMap<Integer, Integer> sorted = sortByValues(unsorted);
         createFPtree(data, sorted,  minSup);
     }
@@ -46,22 +53,9 @@ public class FPGrowth {
      * @param sortedMap the count sorted by value ascending
      * @param minSup minimum support threshold
      */
-    private void createFPtree(Map<Integer, Set<Integer>> data, TreeMap<Integer, Integer> sortedMap,  float minSup) {
-        Node treeRoot = new Node(-1, null);
-        Tree fpTree = new Tree(minSup);
+    private void createFPtree(Map<Integer, Set<Integer>> data, TreeMap<Integer, Integer> sortedMap,  float minSup) throws IOException {
+        Tree fpTree = new Tree();
         ArrayList<Integer> transaction = new ArrayList<>();
-
-
-//        for(Map.Entry<Integer, Integer> temp: sortedMap.descendingMap().entrySet())
-//        {
-//            System.out.println(temp.getKey()+" :k, "+temp.getValue()+" :v");
-//        }
-//        System.out.println();
-//        for(Map.Entry<Integer, Integer> temp: sortedMap.entrySet())
-//        {
-//            System.out.println(temp.getKey()+" :k, "+temp.getValue()+" :v");
-//        }
-
 
         for(Integer x: data.keySet())
         {
@@ -85,8 +79,8 @@ public class FPGrowth {
      * @param sortedMap the count sorted by value ascending
      * @param minSup minimum support threshold
      */
-    private void startMine(Tree fpTree, TreeMap<Integer, Integer> sortedMap,  float minSup){
-        HashMap<Set<Integer>, Integer> frequentItems = new HashMap<Set<Integer>, Integer>();
+    private void startMine(Tree fpTree, TreeMap<Integer, Integer> sortedMap,  float minSup) throws IOException {
+        HashMap<Set<Integer>, Integer> frequentItems = new HashMap<>();
 
 
 
@@ -101,15 +95,9 @@ public class FPGrowth {
 
 
         }
-        System.out.println("\n\n|FPs| "+frequentItems.size()+"\n");
+        System.out.println("|FPs| "+frequentItems.size()+"\n");
+        Read.outputFP(frequentItems);
 
-        for(Map.Entry<Set<Integer>, Integer> f : frequentItems.entrySet())
-        {
-
-            System.out.println(f.getKey()+" : "+f.getValue());
-        }
-
-        System.out.println("\n\n|FPs| "+frequentItems.size()+"\n");
     }
 
 
@@ -124,13 +112,13 @@ public class FPGrowth {
         ArrayList<ArrayList<Integer>> transactionList = new ArrayList<>();
         LinkedHashMap<Integer, Integer> sortedCount = new LinkedHashMap<>();
         int count = 0;
-        int tempVal = 0;
+        int tempVal;
         int nodeFrequency = 0;
 
+
         if (header != null && header.getName() != -1) {
-            Tree conditionalTree = new Tree(minSup);
+            Tree conditionalTree = new Tree();
             prefix.add(header.getName());
-//            System.out.println(header.name + " h " + prefix.toString() + " prefix");
             Node temp = header;
 
             while (temp != null && temp.getName() != -1) {
@@ -155,22 +143,12 @@ public class FPGrowth {
             }
             for (ArrayList<Integer> tempTransaction : transactionList) {
                 for (int i : tempTransaction) {
-                    if (sortedCount.get(i) == null) {
-                        sortedCount.put(i, 1);
-                    } else {
-                        sortedCount.put(i, sortedCount.get(i) + 1);
-                    }
+                    sortedCount.merge(i, 1, Integer::sum);
                 }
             }
 
 
-            Iterator<Map.Entry<Integer, Integer>> iterator = sortedCount.entrySet().iterator();
-            while (iterator.hasNext()) {
-                Map.Entry<Integer, Integer> entry = iterator.next();
-                if (entry.getValue() < minSup) {
-                    iterator.remove();
-                }
-            }
+            sortedCount.entrySet().removeIf(entry -> entry.getValue() < minSup);
 
 
             for (ArrayList<Integer> tempTransaction : transactionList) {
@@ -192,7 +170,6 @@ public class FPGrowth {
             if (!conditionalTree.getheaderTable().isEmpty()) {
                 while(!lKeys.isEmpty())
                 {
-//                    System.out.println(conditionalTree.getheaderTable().toString());
                     header = test.get(lKeys.remove(lKeys.size()-1));
 
                     if (header != null) {
@@ -202,12 +179,16 @@ public class FPGrowth {
 
 
                 for (Map.Entry<Integer, Integer> i : sortedCount.entrySet()) {
+                    if(i.getKey() == 65)
+                    {
+                        System.out.println(i.getValue());
+                    }
                     FIbuffer.add(i.getKey());
                     frequentItems.put(FIbuffer, i.getValue());
                     FIbuffer = new HashSet<>(prefix);
                 }
             } else { // If there are no frequent patterns, add the prefix as a frequent pattern
-                frequentItems.put(FIbuffer, nodeFrequency);
+                frequentItems.putIfAbsent(FIbuffer, nodeFrequency);
             }
         }
     }

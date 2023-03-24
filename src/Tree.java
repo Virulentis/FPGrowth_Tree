@@ -19,6 +19,12 @@ class Node{
         frequency = 1;
     }
 
+    /**
+     * Adds a new node if the node is not already there
+     * if it is it increments the frequency of the node
+     * @param nodeN Node to be added
+     * @return the node that was updated/added
+     */
     public Node addChild(Node nodeN)
     {
 
@@ -51,10 +57,6 @@ class Node{
         return link;
     }
 
-    public HashMap<Integer, Node> getChildren() {
-        return children;
-    }
-
     public void incFrequency() {
         frequency++;
     }
@@ -79,16 +81,9 @@ public class Tree {
         return headerTable;
     }
 
-    private float minsup;
-
-    public Tree(float minsup) {
+    public Tree() {
         root = new Node(-1, null);
         headerTable = new HashMap<>();
-        this.minsup = minsup;
-    }
-
-    public Node getRoot() {
-        return root;
     }
 
 
@@ -100,25 +95,21 @@ public class Tree {
         Node temp = root;
 
 
-        for (int j = 0; j < transaction.size(); j++) {
-            temp = temp.addChild(new Node(transaction.get(j), temp));
+        for (Integer integer : transaction) {
+            temp = temp.addChild(new Node(integer, temp));
 
-            //this is to set the header tables links so that you can find every iteration of an item through the header table.
-            if (headerTable.get(temp.getName()) != null )
-            {
-                if(temp.frequency < 2)
-                {
+            //this is to set the header tables links so that you can find every iteration of an item through the header table
+            //and getlink
+            if (headerTable.get(temp.getName()) != null) {
+                if (temp.frequency < 2) {
                     Node linkFind = headerTable.get(temp.getName());
-                    while (linkFind.getLink() != null)
-                    {
+                    while (linkFind.getLink() != null) {
                         linkFind = linkFind.getLink();
                     }
                     linkFind.setLink(temp);
                 }
 
-            }
-            else
-            {
+            } else {
                 headerTable.put(temp.getName(), temp);
             }
 
